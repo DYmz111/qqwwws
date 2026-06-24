@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>斗罗大陆·人生转盘</title>
+    <style>
+        :root {
+            --bg: #f5f3ee;
+            --surface: #ffffff;
+            --gold: #b8943a;
+            --gold-light: #c9a44b;
+            --gold-dark: #7a5f20;
+            --text: #3a3226;
+            --text-dim: #8c8578;
+            --text-light: #5c5240;
+            --accent: #b8403e;
+            --border: #e0d8c8;
+            --wheel-size: 420px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'PingFang SC', 'Noto Serif SC', 'STSong', 'SimSun', 'Songti SC', 'KaiTi', serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .main-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 560px;
+            padding: 16px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .header .title-icon {
+            font-size: 46px;
+            display: block;
+        }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--gold-dark);
+            letter-spacing: 5px;
+            margin: 4px 0;
+        }
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+        }
+        .main-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 20px 22px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+        .wheel-wrapper {
+            position: relative;
+            width: var(--wheel-size);
+            height: var(--wheel-size);
+            margin: 0 auto 18px;
+        }
+        .wheel-wrapper canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 30px solid #c0392b;
+            z-index: 10;
+            transition: border-top-color 0.2s;
+        }
+        .wheel-pointer.spinning {
+            border-top-color: #e74c3c;
+        }
+        .wheel-label {
+            text-align: center;
+            font-size: 15px;
+            color: var(--text-light);
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+            min-height: 22px;
+        }
+        .wheel-progress {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto 8px;
+            padding: 14px 24px;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .btn-spin {
+            background: #b8943a;
+            color: #fff;
+        }
+        .btn-spin:hover:not(:disabled) {
+            background: #c9a44b;
+            transform: translateY(-1px);
+        }
+        .btn-spin:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        .btn-spin:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .btn-next {
+            background: transparent;
+            border: 2px solid #b8943a;
+            color: #b8943a;
+            display: none;
+        }
+        .btn-next:hover {
+            background: rgba(184, 148, 58, 0.06);
+        }
+        .btn-restart {
+            background: #b8403e;
+            color: #fff;
+            display: none;
+        }
+        .btn-restart:hover {
+            background: #c74a48;
+            transform: translateY(-1px);
+        }
+        .current-result {
+            text-align: center;
+            padding: 12px 16px;
+            margin: 6px auto;
+            max-width: 340px;
+            background: #faf9f5;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.35s ease;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .current-result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .result-icon {
+            margin-right: 8px;
+            font-size: 22px;
+        }
+        .results-history {
+            display: none;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #faf9f5;
+            border-radius: 10px;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+        .results-history.show {
+            display: flex;
+        }
+        .result-chip {
+            background: #f0ede4;
+            border: 1px solid #e0d8c8;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: var(--text-light);
+            white-space: nowrap;
+            animation: chipIn 0.3s ease;
+        }
+        @keyframes chipIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .final-summary {
+            display: none;
+            margin-top: 16px;
+            padding: 24px 20px;
+            background: #faf9f5;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            animation: fadeSlideIn 0.5s ease;
+        }
+        .final-summary.show {
+            display: block;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .final-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+        .final-title.god {
+            color: #b8943a;
+        }
+        .final-title.mortal {
+            color: #6b7d8e;
+        }
+        .final-item {
+            display: flex;
+            align-items: baseline;
+            padding: 7px 0;
+            border-bottom: 1px solid #f0ede4;
+            font-size: 14px;
+        }
+        .final-item:last-child {
+            border-bottom: none;
+        }
+        .final-item .label {
+            color: var(--text-dim);
+            min-width: 76px;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .final-item .value {
+            color: var(--text);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 500px) {
+            :root {
+                --wheel-size: 300px;
+            }
+            .wheel-pointer {
+                top: -12px;
+                border-left-width: 10px;
+                border-right-width: 10px;
+                border-top-width: 24px;
+            }
+            .main-card {
+                padding: 18px 10px;
+                border-radius: 16px;
+            }
+            .header h1 {
+                font-size: 21px;
+                letter-spacing: 3px;
+            }
+            .header .title-icon {
+                font-size: 38px;
+            }
+            .btn {
+                max-width: 230px;
+                padding: 12px 18px;
+                font-size: 15px;
+            }
+            .final-title {
+                font-size: 24px;
+            }
+            .current-result {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="header">
+            <span class="title-icon">🎡</span>
+            <h1>斗罗大陆·人生转盘</h1>
+            <p class="subtitle">命运之轮 · 转动乾坤</p>
+        </div>
+
+        <div class="main-card" id="mainCard">
+            <div class="wheel-label" id="wheelLabel">第1转盘：穿越时期</div>
+            <div class="wheel-progress" id="wheelProgress">1 / 15</div>
+
+            <div class="wheel-wrapper" id="wheelWrapper">
+                <div class="wheel-pointer" id="wheelPointer"></div>
+                <canvas id="wheelCanvas" width="840" height="840"></canvas>
+            </div>
+
+            <div class="current-result" id="currentResult"></div>
+
+            <button class="btn btn-spin" id="btnSpin" onclick="spinWheel()">🔮 转 动 命 运</button>
+            <button class="btn btn-next" id="btnNext" onclick="nextWheel()">▶ 继 续</button>
+            <button class="btn btn-restart" id="btnRestart" onclick="restartAll()">🔄 重 新 开 始</button>
+
+            <div class="results-history" id="resultsHistory"></div>
+            <div class="final-summary" id="finalSummary"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据定义 ====================
+
+        const wheelData = {
+            1: {
+                name: '穿越时期',
+                options: ['唐三降生·圣魂村时代', '史莱克七怪成长期', '武魂殿鼎盛时期', '嘉陵关诸神大战时期']
+            },
+            2: { name: '性别', options: ['男', '女'] },
+            3: {
+                name: '身份',
+                options: [
+                    '上三宗嫡子/嫡女（昊天宗/七宝琉璃宗/蓝电霸王龙宗）',
+                    '天斗/星罗皇族后裔',
+                    '隐世神级家族传人',
+                    '草根孤儿（逆袭潜力MAX）',
+                    '武魂殿圣子/圣女',
+                    '宗门弃徒之后',
+                    '铁匠世家出身',
+                    '富可敌国的商贾巨富之后',
+                    '杀手组织「影」从小培养的刺客',
+                    '海神岛遗族后裔'
+                ]
+            },
+            4: {
+                name: '颜值',
+                options: [
+                    '绝世容颜（倾国倾城，男女通杀）',
+                    '上等容貌（万里挑一）',
+                    '俊朗/秀美（看着舒服）',
+                    '中人之姿（不丑不帅）',
+                    '平平无奇（扔人堆里找不到）',
+                    '其貌不扬（略丑）',
+                    '丑不堪言（开局被嫌弃）',
+                    '异色双瞳（独特魅力）'
+                ]
+            },
+            5: {
+                name: '觉醒几个武魂',
+                options: [
+                    '单武魂',
+                    '双生武魂（先天满魂力概率极高）',
+                    '三生武魂（旷古绝今，万年不遇）'
+                ],
+                // ★ 权重：单武魂 75% 面积，双生 20%，三生仅 5%
+                weights: [75, 20, 5]
+            },
+            6: {
+                name: '武魂大类',
+                options: ['器武魂', '兽武魂', '本体武魂', '食物系武魂', '植物系武魂', '特殊武魂']
+            },
+            7: {
+                name: '具体武魂',
+                dependOn: 6,
+                categoryMap: {
+                    '器武魂': [
+                        '昊天锤', '七杀剑', '三叉戟', '天使圣剑', '七宝琉璃塔',
+                        '锄头', '扫把', '镰刀', '小刀', '大羿落日弓',
+                        '木剑', '噬魂幡', '碎星刀', '混元鼎', '铲子',
+                        '八宝如意', '诛神弩', '门', '玄天宝鉴', '裂天画戟'
+                    ],
+                    '兽武魂': [
+                        '蓝电霸王龙', '邪火凤凰', '幽冥灵猫', '白虎', '土鸡',
+                        '青牛', '猴子', '野猪', '翡翠天鹅', '暗金恐爪熊',
+                        '地狱魔龙', '九尾妖狐', '黄金圣龙', '紫翼金鹏', '九幽雀',
+                        '锦鲤', '麻雀', '不死凤凰', '土狗', '麒麟'
+                    ],
+                    '本体武魂': [
+                        '灵眸', '金刚不坏身', '皮肤', '天眼', '碎星手',
+                        '破妄神瞳', '麒麟臂', '不灭金身', '头发', '心脏',
+                        '神行腿', '金刚拳', '灵耳', '天音喉', '百炼骨',
+                        '牙齿', '天罚之眼', '不死之血', '万化之躯', '万象之脑'
+                    ],
+                    '食物系武魂': [
+                        '九品紫芝', '水晶血龙参', '八瓣大蒜', '火锅', '醉仙桃',
+                        '地龙金瓜', '包子', '雪茄', '香肠', '牛奶'
+                    ],
+                    '植物系武魂': [
+                        '菊花', '蓝银草', '六首火凤葵', '血魔藤', '九心海棠',
+                        '鬼藤', '菩提树', '绝情花', '噬魂荆棘', '天青藤',
+                        '世界树', '幽冥鬼兰', '太阳神花', '冰晶雪莲', '太虚道心莲',
+                        '万古青木', '地狱玫瑰', '不死神树', '紫烟曼陀罗', '凤梧'
+                    ],
+                    '特殊武魂': [
+                        '六翼天使', '罗刹魔镰', '海神', '修罗神', '死神镰刀',
+                        '时光之轮', '空间之门', '因果之书', '吞噬黑洞', '六道轮回盘',
+                        '命运之眼', '混沌之源', '混沌青莲', '命运天平', '永恒之枪·冈格尼尔',
+                        '虚无之体', '阴阳双瞳', '轮回之钟', '创世之笔', '七原罪'
+                    ]
+                },
+                getOptions: function(results) {
+                    const cat = results[6];
+                    return this.categoryMap[cat] || this.categoryMap['器武魂'];
+                }
+            },
+            8: { name: '机缘（是否进入外挂转盘）', options: ['是 → 进入第9转盘', '否 → 跳过第9转盘'] },
+            9: {
+                name: '逆天外挂',
+                options: [
+                    '无限存档读档（Re:0）', '写轮眼·万花筒（火影）', '王之财宝（型月）',
+                    '替身·世界（JOJO）', '超级赛亚人血统（龙珠）', '系统面板（系统流）',
+                    '十万年魂兽主动献祭', '神赐魂环×3', '冰火两仪眼',
+                    '远古神王完整传承', '唐门玄天宝录', '八蛛矛进化·神级外附魂骨'
+                ]
+            },
+            10: {
+                name: '特殊经历',
+                options: [
+                    '被武魂殿追杀千里，绝境突破封号斗罗',
+                    '偶遇隐世神级强者，被收为关门弟子',
+                    '误入上古神迹，获得神位传承线索',
+                    '参加全大陆魂师大赛，以一敌百一战封神',
+                    '被挚爱背叛，走上冷血强者之路',
+                    '为救挚爱，独闯武魂殿总部一战成名',
+                    '意外融合百万年魂骨，实力暴涨',
+                    '白手起家建立超级宗门，威震一方',
+                    '被误认为神明转世，获得信仰之力',
+                    '与史莱克七怪并肩作战，结下生死之交',
+                    '独战三位封号斗罗而不败',
+                    '极北之地苦修二十载，出关即封号',
+                    '被封印千年后苏醒，实力未减反增',
+                    '穿越时空裂缝，改变关键历史',
+                    '与远古龙族签订契约，成为龙骑士'
+                ]
+            },
+            11: {
+                name: '魂环配置',
+                options: [
+                    '全万年魂环（封号斗罗标准）',
+                    '三紫三黑三红（天才封号配置）',
+                    '全黑五万年+三枚十万年（妖孽配置）',
+                    '全十万年魂环（神级配置·大陆传说）',
+                    '七黑双红+神赐百万年魂环（史诗级）',
+                    '五黑三红+神级魂环（超越十万年）'
+                ]
+            },
+            12: { name: '是否成神', options: ['是 → 进入神位/神战', '否 → 凡间结局'] },
+            13: {
+                name: '神位等级',
+                options: ['至高神王', '一级神祇', '二级神祇', '三级神祇', '自创神位', '伪神']
+            },
+            14: {
+                name: '神战剧情',
+                options: [
+                    '单枪匹马斩杀三位敌对神祇', '独战神王，虽败犹荣',
+                    '率众神抵抗深渊位面入侵', '神界内乱站错队被贬凡间',
+                    '挑战修罗神争夺至高神位', '守护斗罗大陆免受神战波及',
+                    '联手封印远古邪神', '推翻旧秩序建立新神界',
+                    '为守护所爱之人与神界为敌', '诸神黄昏力挽狂澜'
+                ]
+            },
+            15: {
+                name: '最终结局',
+                dependOn: 12,
+                getOptions: function(results) {
+                    const becomeGod = results[12];
+                    if (becomeGod && becomeGod.includes('是')) {
+                        return [
+                            '成为斗罗大陆万古传颂的至高神',
+                            '携爱人归隐神界花园逍遥永世',
+                            '创立万世不朽的超级宗门',
+                            '飞升更高位面成为万界之主',
+                            '与爱人双双成神谱写永恒佳话',
+                            '成为新一代海神/修罗神永世守护'
+                        ];
+                    } else {
+                        return [
+                            '以凡人之躯比肩神明，大陆最强封号斗罗',
+                            '建立万世宗门桃李满天下',
+                            '携爱人隐居山林逍遥一生',
+                            '统一大陆两大帝国开创盛世',
+                            '留下无数传说后神秘消失',
+                            '为守护大陆战死沙场英魂永存'
+                        ];
+                    }
+                }
+            }
+        };
+
+        // ★ 废武魂关键词（权重×3，命中率大幅提高）
+        const trashKeywords = {
+            '器武魂': ['锄头', '扫把', '镰刀', '小刀', '木剑', '铲子', '门'],
+            '兽武魂': ['土鸡', '青牛', '猴子', '野猪', '锦鲤', '麻雀', '土狗'],
+            '本体武魂': ['皮肤', '头发', '心脏', '牙齿'],
+            '食物系武魂': ['八瓣大蒜', '火锅', '包子', '雪茄', '香肠', '牛奶'],
+            '植物系武魂': ['菊花', '蓝银草'],
+            '特殊武魂': [] // 全是神级，无权重的差别
+        };
+
+        // 称号系统
+        const titleSystem = {
+            god: {
+                first: ['万', '永', '不', '至', '无', '太', '混', '鸿', '天', '玄', '九', '苍', '冥', '虚', '灵'],
+                second: ['古', '恒', '灭', '极', '上', '元', '始', '圣', '尊', '穹', '渊', '霄', '荒', '乾', '坤'],
+                last: ['神帝', '神王', '神皇', '神尊', '真神', '天尊', '道祖', '主宰', '帝君', '圣皇', '神主', '天帝', '圣尊', '神君',
+                    '道尊'
+                ]
+            },
+            mortal: {
+                first: ['绝', '天', '霸', '镇', '诛', '灭', '破', '龙', '凤', '麒', '裂', '碎', '断', '斩', '焚'],
+                second: ['世', '穹', '渊', '霄', '荒', '乾', '坤', '冥', '苍', '玄', '海', '岳', '日', '月', '星'],
+                last: ['至尊', '霸主', '君王', '帝君', '圣主', '天尊', '圣人', '斗罗', '武圣', '战帝', '传奇', '龙皇', '圣王', '帝皇',
+                    '枭雄'
+                ]
+            }
+        };
+
+        function generateTitle(isGod) {
+            const pool = isGod ? titleSystem.god : titleSystem.mortal;
+            const a = pool.first[Math.floor(Math.random() * pool.first.length)];
+            const b = pool.second[Math.floor(Math.random() * pool.second.length)];
+            const c = pool.last[Math.floor(Math.random() * pool.last.length)];
+            return a + b + c;
+        }
+
+        // ==================== 状态管理 ====================
+
+        let results = {};
+        let wheelSequence = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12];
+        let currentSeqIndex = 0;
+        let isSpinning = false;
+        let currentAngle = 0;
+        let spinAnimationId = null;
+
+        let multiSpinTotal = 0;
+        let multiSpinCurrent = 0;
+        let multiSpinResults = [];
+        let wheel7CategoryIndex = 0;
+
+        let finalTitle = '';
+        let isGod = false;
+
+        // ==================== Canvas转盘 ====================
+
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasSize = 840;
+        const centerX = canvasSize / 2;
+        const centerY = canvasSize / 2;
+        const radius = 380;
+        const pointerEl = document.getElementById('wheelPointer');
+
+        const segmentColors = [
+            '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6',
+            '#1abc9c', '#e67e22', '#2980b9', '#27ae60', '#d35400',
+            '#8e44ad', '#16a085', '#c0392b', '#2c3e50', '#f1c40f',
+            '#7f8c8d', '#e91e63', '#00bcd4', '#ff5722', '#607d8b',
+            '#cddc39', '#ff9800', '#673ab7', '#009688', '#795548'
+        ];
+
+        /**
+         * 绘制转盘（支持权重：大权重 = 大扇区）
+         */
+        function drawWheel(options, targetAngle, weights) {
+            ctx.clearRect(0, 0, canvasSize, canvasSize);
+
+            // 白色底盘
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius + 8, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            const numSegments = options.length;
+            const totalWeight = weights ? weights.reduce((a, b) => a + b, 0) : numSegments;
+
+            // 累积角度绘制扇区
+            let cumulativeAngle = targetAngle;
+            for (let i = 0; i < numSegments; i++) {
+                const w = weights ? weights[i] : 1;
+                const arcSize = (w / totalWeight) * (2 * Math.PI);
+                const startAngle = cumulativeAngle;
+                const endAngle = startAngle + arcSize;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                const color = segmentColors[i % segmentColors.length];
+                ctx.fillStyle = color;
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // 文字在扇区中心
+                ctx.save();
+                const textAngle = startAngle + arcSize / 2;
+                const textRadius = radius * 0.6;
+                ctx.translate(centerX, centerY);
+                ctx.rotate(textAngle);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // 字号：窄扇区用小字
+                const arcDeg = (arcSize / (2 * Math.PI)) * 360;
+                let fontSize;
+                if (arcDeg < 8) fontSize = 10;
+                else if (arcDeg < 14) fontSize = 12;
+                else if (arcDeg < 20) fontSize = 14;
+                else if (arcDeg < 35) fontSize = 16;
+                else if (arcDeg < 60) fontSize = 19;
+                else if (arcDeg < 120) fontSize = 22;
+                else fontSize = 28;
+
+                ctx.font = `bold ${fontSize}px "PingFang SC","Noto Serif SC","STSong","SimSun",serif`;
+                ctx.fillStyle = '#fff';
+
+                const text = options[i];
+                const maxWidth = radius * 0.7;
+                // 窄扇区限制宽度
+                const effectiveMax = Math.min(maxWidth, arcSize * radius * 0.85);
+                const lines = wrapText(ctx, text, effectiveMax);
+
+                if (lines.length === 1) {
+                    ctx.fillText(lines[0], textRadius, 0);
+                } else if (lines.length === 2) {
+                    ctx.fillText(lines[0], textRadius, -fontSize * 0.55);
+                    ctx.fillText(lines[1], textRadius, fontSize * 0.55);
+                } else {
+                    ctx.fillText(lines[0], textRadius, -fontSize * 1.05);
+                    ctx.fillText(lines[1], textRadius, 0);
+                    ctx.fillText(lines[2], textRadius, fontSize * 1.05);
+                }
+
+                ctx.restore();
+
+                cumulativeAngle = endAngle;
+            }
+
+            // 中心圆盘
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 52, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#d0c8b0';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 36, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#e8e0d0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = '#b8943a';
+            ctx.fill();
+
+            // 外圈边框
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#c0b8a0';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function wrapText(ctx, text, maxWidth) {
+            if (ctx.measureText(text).width <= maxWidth) return [text];
+            const lines = [];
+            let currentLine = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const testLine = currentLine + char;
+                if (ctx.measureText(testLine).width > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = char;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines.slice(0, 3);
+        }
+
+        // ==================== 权重系统 ====================
+
+        /**
+         * 获取当前转盘的权重数组（没有权重则返回 null，表示均匀分布）
+         */
+        function getCurrentWeights() {
+            const wheelId = wheelSequence[currentSeqIndex];
+
+            // 轮5：单武魂 75% / 双生 20% / 三生 5%
+            if (wheelId === 5 && wheelData[5].weights) {
+                return wheelData[5].weights;
+            }
+
+            // 轮7：废武魂权重×3
+            if (wheelId === 7) {
+                const options = getCurrentWheelOptions();
+                let cat;
+                if (multiSpinTotal > 1) {
+                    const categories = (results[6] || '').split(' + ');
+                    cat = categories[wheel7CategoryIndex] || categories[0];
+                } else {
+                    cat = results[6] || '器武魂';
+                }
+                const trash = trashKeywords[cat] || [];
+                return options.map(opt => trash.some(kw => opt.includes(kw)) ? 3 : 1);
+            }
+
+            return null; // 均匀分布
+        }
+
+        function getCurrentWheelOptions() {
+            const wheelId = wheelSequence[currentSeqIndex];
+            if (wheelId === 7 && multiSpinTotal > 1) {
+                const categories = (results[6] || '').split(' + ');
+                const cat = categories[wheel7CategoryIndex] || categories[0];
+                return wheelData[7].categoryMap[cat] || wheelData[7].categoryMap['器武魂'];
+            }
+            if (wheelData[wheelId].getOptions) {
+                return wheelData[wheelId].getOptions(results);
+            }
+            return wheelData[wheelId].options;
+        }
+
+        function refreshWheel() {
+            const options = getCurrentWheelOptions();
+            const weights = getCurrentWeights();
+            drawWheel(options, currentAngle, weights);
+        }
+
+        // ==================== 加权随机选择 ====================
+
+        function weightedRandomIndex(options, weights) {
+            if (!weights) {
+                return Math.floor(Math.random() * options.length);
+            }
+            const totalWeight = weights.reduce((a, b) => a + b, 0);
+            let rand = Math.random() * totalWeight;
+            for (let i = 0; i < options.length; i++) {
+                rand -= weights[i];
+                if (rand <= 0) return i;
+            }
+            return options.length - 1;
+        }
+
+        /**
+         * 根据加权扇区角度反算指针指向的索引
+         */
+        function getWeightedIndexByAngle(angle, options, weights) {
+            const numOptions = options.length;
+            const totalWeight = weights ? weights.reduce((a, b) => a + b, 0) : numOptions;
+            const normalizedAngle = ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            const pointerAngle = (3 * Math.PI / 2);
+            let relativeAngle = ((pointerAngle - normalizedAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
+            if (weights) {
+                let cumulative = 0;
+                for (let i = 0; i < numOptions; i++) {
+                    const arcSize = (weights[i] / totalWeight) * (2 * Math.PI);
+                    cumulative += arcSize;
+                    if (relativeAngle < cumulative) return i % numOptions;
+                }
+                return numOptions - 1;
+            }
+
+            const arcSize = (2 * Math.PI) / numOptions;
+            return Math.floor(relativeAngle / arcSize) % numOptions;
+        }
+
+        // ==================== 转盘逻辑 ====================
+
+        function spinWheel() {
+            if (isSpinning) return;
+            const options = getCurrentWheelOptions();
+            const weights = getCurrentWeights();
+            if (!options || options.length === 0) return;
+
+            isSpinning = true;
+            pointerEl.classList.add('spinning');
+            document.getElementById('btnSpin').disabled = true;
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('currentResult').classList.remove('show');
+
+            // 加权随机选目标
+            const targetIndex = weightedRandomIndex(options, weights);
+
+            // 计算目标扇区的中心角度
+            const totalWeight = weights ? weights.reduce((a, b) => a + b, 0) : options.length;
+            let cumulativeBefore = 0;
+            if (weights) {
+                for (let i = 0; i < targetIndex; i++) cumulativeBefore += weights[i];
+            } else {
+                cumulativeBefore = targetIndex;
+            }
+            const targetWeight = weights ? weights[targetIndex] : 1;
+            const targetArcSize = (targetWeight / totalWeight) * (2 * Math.PI);
+            const targetSegmentCenter = (cumulativeBefore / totalWeight) * (2 * Math.PI) + targetArcSize / 2;
+
+            const pointerAngle = (3 * Math.PI / 2);
+            let targetFinalAngle = ((pointerAngle - targetSegmentCenter) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+
+            const extraRotations = (6 + Math.floor(Math.random() * 5)) * 2 * Math.PI;
+            const startAngle = currentAngle;
+            const totalRotation = extraRotations + ((targetFinalAngle - startAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 *
+                Math.PI);
+
+            const duration = 3800 + Math.random() * 1600;
+            const startTime = performance.now();
+
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 4);
+                currentAngle = startAngle + totalRotation * eased;
+                drawWheel(options, currentAngle, weights);
+
+                if (progress < 1) {
+                    spinAnimationId = requestAnimationFrame(animate);
+                } else {
+                    currentAngle = startAngle + totalRotation;
+                    drawWheel(options, currentAngle, weights);
+                    isSpinning = false;
+                    pointerEl.classList.remove('spinning');
+                    spinAnimationId = null;
+
+                    const selectedIndex = getWeightedIndexByAngle(currentAngle, options, weights);
+                    const selectedOption = options[selectedIndex];
+                    const wheelId = wheelSequence[currentSeqIndex];
+
+                    // 多转：轮6
+                    if (wheelId === 6 && multiSpinTotal > 1) {
+                        multiSpinResults.push(selectedOption);
+                        multiSpinCurrent++;
+                        if (multiSpinCurrent <= multiSpinTotal) {
+                            showResult(
+                                `武魂大类${multiSpinResults.length}：${selectedOption}（还需转${multiSpinTotal - multiSpinResults.length}次）`
+                                );
+                            document.getElementById('btnSpin').disabled = false;
+                            document.getElementById('btnSpin').textContent =
+                                `🔮 转动武魂大类 ${multiSpinResults.length+1}/${multiSpinTotal}`;
+                            document.getElementById('wheelLabel').textContent =
+                                `第6转盘：武魂大类（第${multiSpinResults.length+1}次）`;
+                            document.getElementById('btnNext').style.display = 'none';
+                            return;
+                        } else {
+                            results[wheelId] = multiSpinResults.join(' + ');
+                            showResult(`武魂大类：${results[wheelId]}`);
+                        }
+                    }
+                    // 多转：轮7
+                    else if (wheelId === 7 && multiSpinTotal > 1) {
+                        multiSpinResults.push(selectedOption);
+                        wheel7CategoryIndex++;
+                        multiSpinCurrent++;
+                        if (multiSpinCurrent <= multiSpinTotal) {
+                            const categories = (results[6] || '').split(' + ');
+                            const currentCat = categories[wheel7CategoryIndex] || categories[0];
+                            showResult(
+                                `武魂${multiSpinResults.length}：${selectedOption}（还需转${multiSpinTotal - multiSpinResults.length}次）`
+                                );
+                            document.getElementById('btnSpin').disabled = false;
+                            document.getElementById('btnSpin').textContent =
+                                `🔮 转动武魂 ${multiSpinResults.length+1}/${multiSpinTotal}`;
+                            document.getElementById('wheelLabel').textContent =
+                                `第7转盘：具体武魂 - ${currentCat}（第${multiSpinResults.length+1}次）`;
+                            document.getElementById('btnNext').style.display = 'none';
+                            refreshWheel();
+                            return;
+                        } else {
+                            results[wheelId] = multiSpinResults.join(' + ');
+                            showResult(`武魂：${results[wheelId]}`);
+                        }
+                    }
+                    // 普通单转
+                    else {
+                        results[wheelId] = selectedOption;
+                        showResult(selectedOption);
+                    }
+
+                    addResultChip(wheelId, results[wheelId]);
+                    document.getElementById('btnNext').style.display = 'block';
+                    document.getElementById('btnNext').focus();
+                }
+            }
+
+            spinAnimationId = requestAnimationFrame(animate);
+        }
+
+        function showResult(text) {
+            const resultEl = document.getElementById('currentResult');
+            resultEl.innerHTML = `<span class="result-icon">✨</span>${text}`;
+            resultEl.classList.add('show');
+        }
+
+        function addResultChip(wheelId, value) {
+            const history = document.getElementById('resultsHistory');
+            history.classList.add('show');
+            const chip = document.createElement('span');
+            chip.className = 'result-chip';
+            const name = typeof wheelData[wheelId].name === 'string' ?
+                wheelData[wheelId].name :
+                wheelData[wheelId].name || `第${wheelId}转盘`;
+            chip.textContent = `${name}: ${value}`;
+            history.appendChild(chip);
+        }
+
+        function nextWheel() {
+            if (isSpinning) return;
+            const currentWheelId = wheelSequence[currentSeqIndex];
+
+            if (currentWheelId === 8) {
+                const choice = results[8];
+                if (choice && choice.includes('是')) {
+                    wheelSequence.splice(currentSeqIndex + 1, 0, 9);
+                }
+            }
+            if (currentWheelId === 12) {
+                const choice = results[12];
+                if (choice && choice.includes('是')) {
+                    isGod = true;
+                    wheelSequence.push(13, 14, 15);
+                } else {
+                    isGod = false;
+                    wheelSequence.push(15);
+                }
+            }
+
+            currentSeqIndex++;
+            if (currentSeqIndex >= wheelSequence.length) {
+                showFinalSummary();
+                return;
+            }
+
+            const nextWheelId = wheelSequence[currentSeqIndex];
+            if (nextWheelId === 6 || nextWheelId === 7) {
+                const countStr = results[5] || '';
+                if (countStr.includes('双生')) multiSpinTotal = 2;
+                else if (countStr.includes('三生')) multiSpinTotal = 3;
+                else multiSpinTotal = 1;
+                multiSpinCurrent = 1;
+                multiSpinResults = [];
+                if (nextWheelId === 7) wheel7CategoryIndex = 0;
+            }
+
+            updateWheelUI(nextWheelId);
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('currentResult').classList.remove('show');
+            document.getElementById('currentResult').innerHTML = '';
+            document.getElementById('btnSpin').disabled = false;
+            document.getElementById('btnSpin').textContent = '🔮 转 动 命 运';
+        }
+
+        function updateWheelUI(wheelId) {
+            const totalWheels = wheelSequence.length;
+            const currentDisplayIndex = currentSeqIndex + 1;
+            let labelText = `第${wheelId}转盘：`;
+            if (typeof wheelData[wheelId].name === 'string') {
+                labelText += wheelData[wheelId].name;
+            } else {
+                labelText += wheelData[wheelId].name || '';
+            }
+            if (multiSpinTotal > 1) {
+                if (wheelId === 6) {
+                    labelText += `（第${multiSpinCurrent}次）`;
+                } else if (wheelId === 7) {
+                    const categories = (results[6] || '').split(' + ');
+                    const cat = categories[wheel7CategoryIndex] || '';
+                    labelText += ` - ${cat}（第${multiSpinCurrent}次）`;
+                }
+            }
+            document.getElementById('wheelLabel').textContent = labelText;
+            document.getElementById('wheelProgress').textContent = `${currentDisplayIndex} / ${totalWheels}`;
+            refreshWheel();
+        }
+
+        function showFinalSummary() {
+            document.getElementById('wheelWrapper').style.display = 'none';
+            document.getElementById('wheelPointer').style.display = 'none';
+            document.getElementById('btnSpin').style.display = 'none';
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('currentResult').classList.remove('show');
+            document.getElementById('wheelLabel').textContent = '🎉 命运已定！';
+            document.getElementById('wheelProgress').textContent = '';
+
+            finalTitle = generateTitle(isGod);
+            const icon = isGod ? '🔱' : '⚔️';
+            const titleClass = isGod ? 'god' : 'mortal';
+
+            const summary = document.getElementById('finalSummary');
+            summary.innerHTML = `
+                <div class="final-title ${titleClass}">${icon} ${finalTitle}</div>
+                <div class="final-item"><span class="label">穿越时期</span><span class="value">${results[1]||'—'}</span></div>
+                <div class="final-item"><span class="label">性别</span><span class="value">${results[2]||'—'}</span></div>
+                <div class="final-item"><span class="label">身份</span><span class="value">${results[3]||'—'}</span></div>
+                <div class="final-item"><span class="label">颜值</span><span class="value">${results[4]||'—'}</span></div>
+                <div class="final-item"><span class="label">武魂数量</span><span class="value">${results[5]||'—'}</span></div>
+                <div class="final-item"><span class="label">武魂大类</span><span class="value">${results[6]||'—'}</span></div>
+                <div class="final-item"><span class="label">具体武魂</span><span class="value">${results[7]||'—'}</span></div>
+                ${results[9] ? `<div class="final-item"><span class="label">逆天外挂</span><span class="value">${results[9]}</span></div>` : '<div class="final-item"><span class="label">逆天外挂</span><span class="value" style="color:#b0a898;">无</span></div>'}
+                <div class="final-item"><span class="label">特殊经历</span><span class="value">${results[10]||'—'}</span></div>
+                <div class="final-item"><span class="label">魂环配置</span><span class="value">${results[11]||'—'}</span></div>
+                ${isGod ? `
+                <div class="final-item"><span class="label">神位等级</span><span class="value">${results[13]||'—'}</span></div>
+                <div class="final-item"><span class="label">神战剧情</span><span class="value">${results[14]||'—'}</span></div>
+                ` : ''}
+                <div class="final-item"><span class="label">最终结局</span><span class="value">${results[15]||'—'}</span></div>
+            `;
+            summary.classList.add('show');
+            document.getElementById('btnRestart').style.display = 'block';
+        }
+
+        function restartAll() {
+            if (spinAnimationId) { cancelAnimationFrame(spinAnimationId);
+                spinAnimationId = null; }
+            results = {};
+            wheelSequence = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12];
+            currentSeqIndex = 0;
+            isSpinning = false;
+            currentAngle = 0;
+            multiSpinTotal = 0;
+            multiSpinCurrent = 0;
+            multiSpinResults = [];
+            wheel7CategoryIndex = 0;
+            finalTitle = '';
+            isGod = false;
+
+            document.getElementById('wheelWrapper').style.display = 'block';
+            document.getElementById('wheelPointer').style.display = 'block';
+            document.getElementById('wheelPointer').classList.remove('spinning');
+            document.getElementById('btnSpin').style.display = 'block';
+            document.getElementById('btnSpin').disabled = false;
+            document.getElementById('btnSpin').textContent = '🔮 转 动 命 运';
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('btnRestart').style.display = 'none';
+            document.getElementById('currentResult').classList.remove('show');
+            document.getElementById('currentResult').innerHTML = '';
+            document.getElementById('resultsHistory').classList.remove('show');
+            document.getElementById('resultsHistory').innerHTML = '';
+            document.getElementById('finalSummary').classList.remove('show');
+            document.getElementById('finalSummary').innerHTML = '';
+            document.getElementById('wheelLabel').textContent = '第1转盘：穿越时期';
+            document.getElementById('wheelProgress').textContent = '1 / 12';
+            refreshWheel();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                if (!isSpinning && document.getElementById('btnSpin').style.display !== 'none') {
+                    spinWheel();
+                } else if (!isSpinning && document.getElementById('btnNext').style.display === 'block') {
+                    nextWheel();
+                }
+            }
+            if (e.code === 'KeyR' && e.ctrlKey) {
+                e.preventDefault();
+                restartAll();
+            }
+        });
+
+        function init() {
+            refreshWheel();
+            document.getElementById('wheelLabel').textContent = '第1转盘：穿越时期';
+            document.getElementById('wheelProgress').textContent = '1 / 12';
+        }
+
+        init();
+        console.log('🎡 斗罗大陆·人生转盘 已就绪');
+        console.log('   ⚖️ 轮5权重: 单武魂75% | 双生20% | 三生5%');
+        console.log('   🗑️ 轮7: 废武魂(锄头/土鸡/门等)权重×3');
+    </script>
+</body>
+</html>
