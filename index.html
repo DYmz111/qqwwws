@@ -166,11 +166,11 @@
             text-align: center;
             padding: 12px 16px;
             margin: 6px auto;
-            max-width: 340px;
+            max-width: 380px;
             background: #faf9f5;
             border: 1px solid var(--border);
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             color: var(--text-light);
             letter-spacing: 1px;
@@ -181,6 +181,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            word-break: break-all;
         }
         .current-result.show {
             opacity: 1;
@@ -189,6 +190,7 @@
         .result-icon {
             margin-right: 8px;
             font-size: 22px;
+            flex-shrink: 0;
         }
         .results-history {
             display: none;
@@ -313,7 +315,7 @@
                 font-size: 24px;
             }
             .current-result {
-                font-size: 15px;
+                font-size: 14px;
             }
         }
     </style>
@@ -391,7 +393,6 @@
                     '双生武魂（先天满魂力概率极高）',
                     '三生武魂（旷古绝今，万年不遇）'
                 ],
-                // ★ 权重：单武魂 75% 面积，双生 20%，三生仅 5%
                 weights: [75, 20, 5]
             },
             6: {
@@ -446,56 +447,76 @@
             9: {
                 name: '逆天外挂',
                 options: [
-                    '无限存档读档（Re:0）', '写轮眼·万花筒（火影）', '王之财宝（型月）',
-                    '替身·世界（JOJO）', '超级赛亚人血统（龙珠）', '系统面板（系统流）',
-                    '十万年魂兽主动献祭', '神赐魂环×3', '冰火两仪眼',
-                    '远古神王完整传承', '唐门玄天宝录', '八蛛矛进化·神级外附魂骨'
+                    '无限存档读档（死亡自动回档，保留全部记忆，无限试错）',
+                    '写轮眼·万花筒（复制一切魂技+月读+天照+须佐能乎）',
+                    '王之财宝（连通异次元宝库，无尽神器随意投射，对神宝具）',
+                    '替身·世界（暂停时间5秒，时停内自由行动，同阶无敌）',
+                    '超级赛亚人血统（每次濒死恢复战力×50，无上限突破）',
+                    '系统面板（任务奖励+商城兑换+一键升级+全图鉴鉴查）',
+                    '十万年魂兽主动献祭（直接获得十万年魂环+魂骨，无副作用）',
+                    '神赐魂环×3（获得三个最适合自身武魂的十万年魂环）',
+                    '冰火两仪眼（仙草随便嗑+极致水火淬体+百毒不侵）',
+                    '远古神王完整传承（无需考核，直接继承神位+全套神器）',
+                    '唐门玄天宝录（玄天功+鬼影迷踪+暗器百解+玄玉手+紫极魔瞳）',
+                    '八蛛矛进化·神级外附魂骨（可吞噬吸收一切魂骨进化，无限成长）'
                 ]
             },
             10: {
                 name: '特殊经历',
                 options: [
-                    '被武魂殿追杀千里，绝境突破封号斗罗',
+                    '被武魂殿追杀千里，绝境中突破封号斗罗',
                     '偶遇隐世神级强者，被收为关门弟子',
                     '误入上古神迹，获得神位传承线索',
                     '参加全大陆魂师大赛，以一敌百一战封神',
-                    '被挚爱背叛，走上冷血强者之路',
-                    '为救挚爱，独闯武魂殿总部一战成名',
-                    '意外融合百万年魂骨，实力暴涨',
+                    '被挚爱背叛，心性大变，走上冷血强者之路',
+                    '为救挚爱，独闯武魂殿总部，一战成名',
+                    '意外融合一块百万年魂骨，实力暴涨',
                     '白手起家建立超级宗门，威震一方',
-                    '被误认为神明转世，获得信仰之力',
+                    '被误认为神明转世，万人朝拜，获得信仰之力',
                     '与史莱克七怪并肩作战，结下生死之交',
-                    '独战三位封号斗罗而不败',
+                    '独战三位封号斗罗而不败，名震大陆',
                     '极北之地苦修二十载，出关即封号',
                     '被封印千年后苏醒，实力未减反增',
-                    '穿越时空裂缝，改变关键历史',
+                    '穿越时空裂缝，回到过去改变关键历史',
                     '与远古龙族签订契约，成为龙骑士'
                 ]
             },
             11: {
                 name: '魂环配置',
                 options: [
-                    '全万年魂环（封号斗罗标准）',
+                    '全万年魂环（九环皆为万年，封号斗罗标准）',
                     '三紫三黑三红（天才封号配置）',
-                    '全黑五万年+三枚十万年（妖孽配置）',
-                    '全十万年魂环（神级配置·大陆传说）',
-                    '七黑双红+神赐百万年魂环（史诗级）',
-                    '五黑三红+神级魂环（超越十万年）'
+                    '全黑五万年以上+三枚十万年（妖孽配置）',
+                    '全十万年魂环（九环皆红，神级配置·大陆传说）',
+                    '七黑双红+一枚神赐百万年魂环（史诗级）',
+                    '五黑三红+一枚神级魂环（超越十万年限制，神界认证）'
                 ]
             },
             12: { name: '是否成神', options: ['是 → 进入神位/神战', '否 → 凡间结局'] },
             13: {
                 name: '神位等级',
-                options: ['至高神王', '一级神祇', '二级神祇', '三级神祇', '自创神位', '伪神']
+                options: [
+                    '至高神王（修罗神/海神/善良之神/邪恶之神级别）',
+                    '一级神祇（天使神/罗刹神/破坏神级别）',
+                    '二级神祇（战神/速度之神/力量之神级别）',
+                    '三级神祇（小众神位，掌管一方小世界）',
+                    '自创神位（另辟蹊径，独成一派，不归神界管辖）',
+                    '伪神（依靠外力强行成神，力量有缺陷但仍是神）'
+                ]
             },
             14: {
                 name: '神战剧情',
                 options: [
-                    '单枪匹马斩杀三位敌对神祇', '独战神王，虽败犹荣',
-                    '率众神抵抗深渊位面入侵', '神界内乱站错队被贬凡间',
-                    '挑战修罗神争夺至高神位', '守护斗罗大陆免受神战波及',
-                    '联手封印远古邪神', '推翻旧秩序建立新神界',
-                    '为守护所爱之人与神界为敌', '诸神黄昏力挽狂澜'
+                    '参与诸神之战，单枪匹马斩杀三位敌对神祇，扬名神界',
+                    '独战神王，虽败犹荣，获神界全体神祇敬重',
+                    '率众神抵抗深渊位面入侵，成为救世主',
+                    '神界内乱站错队，被贬下凡间，实力大损但不灭',
+                    '挑战修罗神，争夺至高神位，胜负成千古悬案',
+                    '以一己之力守护斗罗大陆免受神战波及',
+                    '联手五位神祇封印远古邪神，功盖万世',
+                    '推翻旧秩序，建立新神界，成为一方神界霸主',
+                    '为守护所爱之人，与整个神界为敌，杀出一条血路',
+                    '诸神黄昏降临，以一己之力力挽狂澜'
                 ]
             },
             15: {
@@ -505,35 +526,35 @@
                     const becomeGod = results[12];
                     if (becomeGod && becomeGod.includes('是')) {
                         return [
-                            '成为斗罗大陆万古传颂的至高神',
-                            '携爱人归隐神界花园逍遥永世',
-                            '创立万世不朽的超级宗门',
-                            '飞升更高位面成为万界之主',
-                            '与爱人双双成神谱写永恒佳话',
-                            '成为新一代海神/修罗神永世守护'
+                            '成为斗罗大陆万古传颂的至高神，神像遍立大陆',
+                            '携爱人归隐神界花园，逍遥永世',
+                            '创立万世不朽的超级宗门，香火永续',
+                            '飞升更高位面，成为万界之主',
+                            '与爱人双双成神，谱写永恒佳话',
+                            '成为新一代海神/修罗神，永世守护斗罗大陆'
                         ];
                     } else {
                         return [
-                            '以凡人之躯比肩神明，大陆最强封号斗罗',
-                            '建立万世宗门桃李满天下',
-                            '携爱人隐居山林逍遥一生',
-                            '统一大陆两大帝国开创盛世',
-                            '留下无数传说后神秘消失',
-                            '为守护大陆战死沙场英魂永存'
+                            '以凡人之躯比肩神明，成为大陆最强封号斗罗',
+                            '建立万世宗门，桃李满天下，寿终正寝',
+                            '携爱人隐居山林，逍遥一生，无疾而终',
+                            '统一大陆两大帝国，开创前所未有之盛世',
+                            '留下无数传说后神秘消失，成为千古之谜',
+                            '为守护大陆战死沙场，英魂永存，后世立碑'
                         ];
                     }
                 }
             }
         };
 
-        // ★ 废武魂关键词（权重×3，命中率大幅提高）
+        // 废武魂关键词（权重×3）
         const trashKeywords = {
             '器武魂': ['锄头', '扫把', '镰刀', '小刀', '木剑', '铲子', '门'],
             '兽武魂': ['土鸡', '青牛', '猴子', '野猪', '锦鲤', '麻雀', '土狗'],
             '本体武魂': ['皮肤', '头发', '心脏', '牙齿'],
             '食物系武魂': ['八瓣大蒜', '火锅', '包子', '雪茄', '香肠', '牛奶'],
             '植物系武魂': ['菊花', '蓝银草'],
-            '特殊武魂': [] // 全是神级，无权重的差别
+            '特殊武魂': []
         };
 
         // 称号系统
@@ -597,13 +618,9 @@
             '#cddc39', '#ff9800', '#673ab7', '#009688', '#795548'
         ];
 
-        /**
-         * 绘制转盘（支持权重：大权重 = 大扇区）
-         */
         function drawWheel(options, targetAngle, weights) {
             ctx.clearRect(0, 0, canvasSize, canvasSize);
 
-            // 白色底盘
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius + 8, 0, 2 * Math.PI);
             ctx.fillStyle = '#ffffff';
@@ -612,7 +629,6 @@
             const numSegments = options.length;
             const totalWeight = weights ? weights.reduce((a, b) => a + b, 0) : numSegments;
 
-            // 累积角度绘制扇区
             let cumulativeAngle = targetAngle;
             for (let i = 0; i < numSegments; i++) {
                 const w = weights ? weights[i] : 1;
@@ -628,12 +644,10 @@
                 const color = segmentColors[i % segmentColors.length];
                 ctx.fillStyle = color;
                 ctx.fill();
-
                 ctx.strokeStyle = 'rgba(255,255,255,0.5)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // 文字在扇区中心
                 ctx.save();
                 const textAngle = startAngle + arcSize / 2;
                 const textRadius = radius * 0.6;
@@ -642,7 +656,6 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // 字号：窄扇区用小字
                 const arcDeg = (arcSize / (2 * Math.PI)) * 360;
                 let fontSize;
                 if (arcDeg < 8) fontSize = 10;
@@ -657,9 +670,7 @@
                 ctx.fillStyle = '#fff';
 
                 const text = options[i];
-                const maxWidth = radius * 0.7;
-                // 窄扇区限制宽度
-                const effectiveMax = Math.min(maxWidth, arcSize * radius * 0.85);
+                const effectiveMax = Math.min(radius * 0.7, arcSize * radius * 0.85);
                 const lines = wrapText(ctx, text, effectiveMax);
 
                 if (lines.length === 1) {
@@ -672,13 +683,11 @@
                     ctx.fillText(lines[1], textRadius, 0);
                     ctx.fillText(lines[2], textRadius, fontSize * 1.05);
                 }
-
                 ctx.restore();
 
                 cumulativeAngle = endAngle;
             }
 
-            // 中心圆盘
             ctx.beginPath();
             ctx.arc(centerX, centerY, 52, 0, 2 * Math.PI);
             ctx.fillStyle = '#ffffff';
@@ -698,7 +707,6 @@
             ctx.fillStyle = '#b8943a';
             ctx.fill();
 
-            // 外圈边框
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
             ctx.strokeStyle = '#c0b8a0';
@@ -724,20 +732,9 @@
             return lines.slice(0, 3);
         }
 
-        // ==================== 权重系统 ====================
-
-        /**
-         * 获取当前转盘的权重数组（没有权重则返回 null，表示均匀分布）
-         */
         function getCurrentWeights() {
             const wheelId = wheelSequence[currentSeqIndex];
-
-            // 轮5：单武魂 75% / 双生 20% / 三生 5%
-            if (wheelId === 5 && wheelData[5].weights) {
-                return wheelData[5].weights;
-            }
-
-            // 轮7：废武魂权重×3
+            if (wheelId === 5 && wheelData[5].weights) return wheelData[5].weights;
             if (wheelId === 7) {
                 const options = getCurrentWheelOptions();
                 let cat;
@@ -750,8 +747,7 @@
                 const trash = trashKeywords[cat] || [];
                 return options.map(opt => trash.some(kw => opt.includes(kw)) ? 3 : 1);
             }
-
-            return null; // 均匀分布
+            return null;
         }
 
         function getCurrentWheelOptions() {
@@ -773,12 +769,8 @@
             drawWheel(options, currentAngle, weights);
         }
 
-        // ==================== 加权随机选择 ====================
-
         function weightedRandomIndex(options, weights) {
-            if (!weights) {
-                return Math.floor(Math.random() * options.length);
-            }
+            if (!weights) return Math.floor(Math.random() * options.length);
             const totalWeight = weights.reduce((a, b) => a + b, 0);
             let rand = Math.random() * totalWeight;
             for (let i = 0; i < options.length; i++) {
@@ -788,31 +780,23 @@
             return options.length - 1;
         }
 
-        /**
-         * 根据加权扇区角度反算指针指向的索引
-         */
         function getWeightedIndexByAngle(angle, options, weights) {
             const numOptions = options.length;
             const totalWeight = weights ? weights.reduce((a, b) => a + b, 0) : numOptions;
             const normalizedAngle = ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
             const pointerAngle = (3 * Math.PI / 2);
             let relativeAngle = ((pointerAngle - normalizedAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-
             if (weights) {
                 let cumulative = 0;
                 for (let i = 0; i < numOptions; i++) {
-                    const arcSize = (weights[i] / totalWeight) * (2 * Math.PI);
-                    cumulative += arcSize;
+                    cumulative += (weights[i] / totalWeight) * (2 * Math.PI);
                     if (relativeAngle < cumulative) return i % numOptions;
                 }
                 return numOptions - 1;
             }
-
             const arcSize = (2 * Math.PI) / numOptions;
             return Math.floor(relativeAngle / arcSize) % numOptions;
         }
-
-        // ==================== 转盘逻辑 ====================
 
         function spinWheel() {
             if (isSpinning) return;
@@ -826,10 +810,7 @@
             document.getElementById('btnNext').style.display = 'none';
             document.getElementById('currentResult').classList.remove('show');
 
-            // 加权随机选目标
             const targetIndex = weightedRandomIndex(options, weights);
-
-            // 计算目标扇区的中心角度
             const totalWeight = weights ? weights.reduce((a, b) => a + b, 0) : options.length;
             let cumulativeBefore = 0;
             if (weights) {
@@ -840,7 +821,6 @@
             const targetWeight = weights ? weights[targetIndex] : 1;
             const targetArcSize = (targetWeight / totalWeight) * (2 * Math.PI);
             const targetSegmentCenter = (cumulativeBefore / totalWeight) * (2 * Math.PI) + targetArcSize / 2;
-
             const pointerAngle = (3 * Math.PI / 2);
             let targetFinalAngle = ((pointerAngle - targetSegmentCenter) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
 
@@ -872,7 +852,6 @@
                     const selectedOption = options[selectedIndex];
                     const wheelId = wheelSequence[currentSeqIndex];
 
-                    // 多转：轮6
                     if (wheelId === 6 && multiSpinTotal > 1) {
                         multiSpinResults.push(selectedOption);
                         multiSpinCurrent++;
@@ -891,9 +870,7 @@
                             results[wheelId] = multiSpinResults.join(' + ');
                             showResult(`武魂大类：${results[wheelId]}`);
                         }
-                    }
-                    // 多转：轮7
-                    else if (wheelId === 7 && multiSpinTotal > 1) {
+                    } else if (wheelId === 7 && multiSpinTotal > 1) {
                         multiSpinResults.push(selectedOption);
                         wheel7CategoryIndex++;
                         multiSpinCurrent++;
@@ -915,9 +892,7 @@
                             results[wheelId] = multiSpinResults.join(' + ');
                             showResult(`武魂：${results[wheelId]}`);
                         }
-                    }
-                    // 普通单转
-                    else {
+                    } else {
                         results[wheelId] = selectedOption;
                         showResult(selectedOption);
                     }
@@ -1111,9 +1086,6 @@
         }
 
         init();
-        console.log('🎡 斗罗大陆·人生转盘 已就绪');
-        console.log('   ⚖️ 轮5权重: 单武魂75% | 双生20% | 三生5%');
-        console.log('   🗑️ 轮7: 废武魂(锄头/土鸡/门等)权重×3');
     </script>
 </body>
 </html>
